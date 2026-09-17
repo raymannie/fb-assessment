@@ -38,5 +38,6 @@ export async function useMockConfig(page: Page, patch: MockConfigPatch = {}): Pr
  */
 export async function gotoApp(page: Page, path = '/'): Promise<void> {
   await page.goto(path)
-  await page.getByRole('banner').waitFor()
+  // Not getByRole: a deep link may open a modal immediately, which marks the header aria-hidden.
+  await page.locator('header').first().waitFor()
 }

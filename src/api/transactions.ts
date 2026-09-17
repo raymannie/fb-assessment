@@ -1,4 +1,10 @@
-import { type TransactionFilters, type TransactionsPage, transactionsPageSchema } from '@/types/api'
+import {
+  type Transaction,
+  type TransactionFilters,
+  type TransactionsPage,
+  transactionSchema,
+  transactionsPageSchema,
+} from '@/types/api'
 
 import { baseApi } from './baseApi'
 
@@ -29,7 +35,14 @@ export const transactionsApi = baseApi.injectEndpoints({
       transformResponse: (raw: unknown) => transactionsPageSchema.parse(raw),
       providesTags: ['Transactions'],
     }),
+
+    /** Single row, for deep links (`?txn=id`) when the feed hasn't loaded that page. */
+    getTransaction: build.query<Transaction, string>({
+      query: (id) => `/transactions/${encodeURIComponent(id)}`,
+      transformResponse: (raw: unknown) => transactionSchema.parse(raw),
+      providesTags: (_result, _error, id) => [{ type: 'Transactions', id }],
+    }),
   }),
 })
 
-export const { useGetTransactionsInfiniteQuery } = transactionsApi
+export const { useGetTransactionsInfiniteQuery, useGetTransactionQuery } = transactionsApi

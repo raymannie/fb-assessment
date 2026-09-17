@@ -3,7 +3,7 @@
 Take-home for FirstBank Digital Factory — Frontend Engineer, Web (React).
 
 A small merchant's view of their NovaBiz wallet: live balance with today's inflow/outflow, a
-virtualized transaction feed with filters, and a four-step Send Money flow whose optimistic update
+virtualized transaction feed with filters and a per-transaction detail view, and a four-step Send Money flow whose optimistic update
 reconciles correctly when the (mocked) network fails **or goes silent**. There is no backend; the API
 is served by MSW in every environment, with configurable latency, failure and timeout behaviour.
 
@@ -104,14 +104,14 @@ flowchart LR
 
 ### State boundaries
 
-| Where                 | What                                                                          | Why                                                                                                                                              |
-| --------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **RTK Query**         | balance, transaction pages, transfer create/status, name enquiry              | Server state: caching, dedupe, tags, request flags, and `onQueryStarted` gives optimistic patch/undo primitives                                  |
-| **`sendMoney` slice** | draft, Idempotency-Key + fingerprint, the in-flight `submission` record       | Must outlive the dialog: the poll loop and the "confirming" lock keep working after the sheet is closed; Redux DevTools shows the whole timeline |
-| **`announcer` slice** | current polite / assertive message                                            | One pair of live regions mounted in `Providers` before anything can announce                                                                     |
-| **`theme` slice**     | light / dark / system                                                         | Only client preference; mirrored to `localStorage` — the **only** thing stored there                                                             |
-| **URL search params** | feed filters (`from`, `to`, `status`, `type`)                                 | Shareable, back-button friendly, contains no PII                                                                                                 |
-| **Local state**       | react-hook-form field values per step, popover open flags, virtualizer scroll | Ephemeral; committed to the slice on step advance so Back/Next and close/reopen preserve values                                                  |
+| Where                 | What                                                                           | Why                                                                                                                                              |
+| --------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **RTK Query**         | balance, transaction pages, transfer create/status, name enquiry               | Server state: caching, dedupe, tags, request flags, and `onQueryStarted` gives optimistic patch/undo primitives                                  |
+| **`sendMoney` slice** | draft, Idempotency-Key + fingerprint, the in-flight `submission` record        | Must outlive the dialog: the poll loop and the "confirming" lock keep working after the sheet is closed; Redux DevTools shows the whole timeline |
+| **`announcer` slice** | current polite / assertive message                                             | One pair of live regions mounted in `Providers` before anything can announce                                                                     |
+| **`theme` slice**     | light / dark / system                                                          | Only client preference; mirrored to `localStorage` — the **only** thing stored there                                                             |
+| **URL search params** | feed filters (`from`, `to`, `status`, `type`) and the open transaction (`txn`) | Shareable, back-button friendly (Android back closes the detail sheet), contains no PII                                                          |
+| **Local state**       | react-hook-form field values per step, popover open flags, virtualizer scroll  | Ephemeral; committed to the slice on step advance so Back/Next and close/reopen preserve values                                                  |
 
 ### Folder layout
 
@@ -233,6 +233,9 @@ omitted) were tried deliberately: the first fails 3 unit + 4 e2e tests, the seco
 - Touch targets are 44 px on small screens (buttons, inputs, selects). Visible focus rings
   everywhere; skip link; `<section aria-labelledby>` landmarks; `role="list"` restored on the
   virtualized `<ul>` because Safari drops list semantics once `list-style` is reset.
+- Feed rows are real `<button>`s (`aria-haspopup="dialog"`) opening a detail sheet; focus returns to
+  the row on close. Radix's modal dialog restores focus to a `DialogTrigger` we don't use, so the
+  opener is captured explicitly (`lib/returnFocus.ts`) — the same fix applies to Send Money.
 - "Load more" is always rendered as a real button as the keyboard/screen-reader path to pagination;
   manual loads announce "Loaded 50 more. Showing 100 transactions."
 

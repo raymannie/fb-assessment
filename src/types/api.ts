@@ -133,6 +133,7 @@ export const apiErrorCodeSchema = z.enum([
   'RECIPIENT_NOT_FOUND',
   'INVALID_CURSOR',
   'TRANSFER_NOT_FOUND',
+  'TRANSACTION_NOT_FOUND',
   'IDEMPOTENCY_CONFLICT',
   'INTERNAL',
 ])

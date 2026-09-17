@@ -34,7 +34,7 @@ test.describe('mock API in the browser', () => {
 
     expect(await page.evaluate(() => fetch('/api/balance').then((r) => r.status))).toBe(500)
     await page.reload()
-    await page.getByRole('banner').waitFor()
+    await page.locator('header').first().waitFor()
     expect(await page.evaluate(() => fetch('/api/balance').then((r) => r.status))).toBe(500)
     expect(await page.evaluate(() => Object.keys(localStorage))).toEqual([])
   })
