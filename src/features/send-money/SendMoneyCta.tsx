@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react'
 
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { Button } from '@/components/ui/button'
+import { rememberOpener } from '@/lib/returnFocus'
 import { cn } from '@/lib/utils'
 
 import { openDialog, selectIsLocked, selectSendMoneyOpen } from './sendMoneySlice'
@@ -20,7 +21,10 @@ export function SendMoneyCta({ className }: { className?: string }) {
       <Button
         type="button"
         className={cn('gap-2', className)}
-        onClick={() => dispatch(openDialog())}
+        onClick={() => {
+          rememberOpener()
+          dispatch(openDialog())
+        }}
         aria-haspopup="dialog"
         aria-expanded={open}
       >

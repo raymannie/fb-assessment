@@ -13,6 +13,15 @@ function isAfterCursor(t: Transaction, cursor: { createdAt: string; id: string }
 }
 
 export const transactionHandlers = [
+  http.get('/api/transactions/:id', async ({ params }) => {
+    await simulateLatency()
+    const failure = maybeReadFailure()
+    if (failure) return failure
+    const transaction = getDb().transactions.find((t) => t.id === String(params.id))
+    if (!transaction) return apiError(404, 'TRANSACTION_NOT_FOUND', 'No transaction with that id')
+    return HttpResponse.json(transaction)
+  }),
+
   http.get('/api/transactions', async ({ request }) => {
     await simulateLatency()
     const failure = maybeReadFailure()

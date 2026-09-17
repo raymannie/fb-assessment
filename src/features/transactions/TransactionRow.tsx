@@ -1,3 +1,4 @@
+import { ChevronRightIcon } from 'lucide-react'
 import { memo } from 'react'
 
 import { Money } from '@/components/Money'
@@ -8,6 +9,7 @@ import { sanitizeText } from '@/lib/sanitize'
 import type { TransactionStatus, TransactionType } from '@/types/api'
 
 export interface TransactionRowProps {
+  id: string
   description: string
   counterpartyName: string
   accountNumberMasked: string
@@ -18,6 +20,8 @@ export interface TransactionRowProps {
   createdAt: string
   /** Set only for the row of an in-flight Send Money submission. */
   phase?: ClientPhase | undefined
+  /** Stable callback (useCallback in the parent) so memo keeps working. */
+  onSelect: (id: string) => void
 }
 
 /**
@@ -29,6 +33,7 @@ export interface TransactionRowProps {
  * a 4-column row from `md` up (time, description, status, amount).
  */
 export const TransactionRow = memo(function TransactionRow({
+  id,
   description,
   counterpartyName,
   accountNumberMasked,
@@ -38,10 +43,16 @@ export const TransactionRow = memo(function TransactionRow({
   status,
   createdAt,
   phase,
+  onSelect,
 }: TransactionRowProps) {
   const signed = type === 'debit' ? subtractKobo(ZERO_KOBO, amount) : amount
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-1 border-b px-1 py-3 md:grid-cols-[9.5rem_minmax(0,1fr)_7.5rem_9rem] md:items-center md:gap-y-0">
+    <button
+      type="button"
+      onClick={() => onSelect(id)}
+      aria-haspopup="dialog"
+      className="hover:bg-muted/50 focus-visible:ring-ring/50 grid w-full grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-1 rounded-md border-b px-1 py-3 text-left outline-none focus-visible:ring-3 md:grid-cols-[9.5rem_minmax(0,1fr)_7.5rem_9rem_1.25rem] md:items-center md:gap-y-0"
+    >
       <time
         dateTime={createdAt}
         className="text-muted-foreground col-span-2 row-start-3 text-xs md:col-span-1 md:col-start-1 md:row-start-1 md:text-sm"
@@ -67,6 +78,10 @@ export const TransactionRow = memo(function TransactionRow({
           type === 'credit' ? 'text-emerald-800 dark:text-emerald-300' : ''
         }`}
       />
-    </div>
+      <ChevronRightIcon
+        aria-hidden="true"
+        className="text-muted-foreground hidden size-4 md:col-start-5 md:block"
+      />
+    </button>
   )
 })

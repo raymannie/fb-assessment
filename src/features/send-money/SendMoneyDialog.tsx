@@ -1,5 +1,6 @@
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { restoreOpenerFocus } from '@/lib/returnFocus'
 
 import { closeDialog, selectSendMoneyOpen, selectStep } from './sendMoneySlice'
 import { AmountStep } from './steps/AmountStep'
@@ -31,6 +32,7 @@ export default function SendMoneyDialog() {
     <Dialog open={open} onOpenChange={(next) => !next && dispatch(closeDialog())}>
       <DialogContent
         onOpenAutoFocus={(e) => e.preventDefault()}
+        onCloseAutoFocus={restoreOpenerFocus}
         className="max-sm:top-auto max-sm:bottom-0 max-sm:left-0 max-sm:max-h-[92dvh] max-sm:w-full max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:overflow-y-auto max-sm:rounded-t-2xl max-sm:rounded-b-none max-sm:pb-[max(1rem,env(safe-area-inset-bottom))] sm:max-w-md"
       >
         <StepShell step={step} headingRef={headingRef}>

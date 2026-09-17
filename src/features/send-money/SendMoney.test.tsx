@@ -243,6 +243,9 @@ describe('Send Money', () => {
 
     await user.click(within(dialog()).getByRole('button', { name: /^done$/i }))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.getAllByRole('button', { name: /send money/i })[0]).toHaveFocus(),
+    )
     expect(getDb().transactions[0]?.idempotencyKey).toBeDefined()
   })
 

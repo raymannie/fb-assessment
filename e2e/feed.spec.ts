@@ -63,3 +63,26 @@ test.describe('balance and transaction feed', () => {
     expect(results.violations).toEqual([])
   })
 })
+
+test.describe('transaction details', () => {
+  test('opens from a row, is deep-linkable, and the back button closes it', async ({ page }) => {
+    await useMockConfig(page)
+    await gotoApp(page)
+    const list = page.getByTestId('transaction-list')
+    const first = list.getByRole('button').first()
+    await first.click()
+    const dialog = page.getByRole('dialog')
+    await expect(dialog).toBeVisible()
+    await expect(page).toHaveURL(/\?txn=txn_\d+/)
+    await expect(dialog.getByText(/^NIP\d+/)).toBeVisible()
+    await expect(dialog).toContainText('******')
+
+    await page.goBack()
+    await expect(dialog).toBeHidden()
+    await expect(page).toHaveURL(/\/$/)
+
+    // Deep link straight into a row that is not on the first page.
+    await gotoApp(page, '/?txn=txn_000400')
+    await expect(page.getByRole('dialog')).toContainText('txn_000400')
+  })
+})
