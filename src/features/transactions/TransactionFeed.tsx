@@ -18,8 +18,10 @@ import type { Transaction } from '@/types/api'
 
 import { countActiveFilters } from './filterModel'
 import { FeedFilters } from './FeedFilters'
+import { TransactionDetailsDialog } from './TransactionDetailsDialog'
 import { TransactionRow } from './TransactionRow'
 import { useFeedFilters } from './useFeedFilters'
+import { useSelectedTransaction } from './useSelectedTransaction'
 
 const ESTIMATED_ROW_PX = 84
 const OVERSCAN = 8
@@ -116,6 +118,9 @@ export function TransactionFeed() {
     previousCount.current = rows.length
   }, [rows.length])
 
+  const { selectedId, open: openDetails, close: closeDetails } = useSelectedTransaction()
+  const selectedRow = useMemo(() => rows.find((t) => t.id === selectedId), [rows, selectedId])
+
   const loadMore = useCallback(() => {
     announceNext.current = true
     void fetchNextPage()
@@ -165,7 +170,7 @@ export function TransactionFeed() {
         >
           <div
             aria-hidden="true"
-            className="text-muted-foreground hidden grid-cols-[9.5rem_minmax(0,1fr)_7.5rem_9rem] gap-x-3 border-b px-1 pb-2 text-xs font-medium tracking-wide uppercase md:grid"
+            className="text-muted-foreground hidden grid-cols-[9.5rem_minmax(0,1fr)_7.5rem_9rem_1.25rem] gap-x-3 border-b px-1 pb-2 text-xs font-medium tracking-wide uppercase md:grid"
           >
             <span>Date</span>
             <span>Description</span>
@@ -197,6 +202,7 @@ export function TransactionFeed() {
                   }}
                 >
                   <TransactionRow
+                    id={t.id}
                     description={t.description}
                     counterpartyName={t.counterparty.name}
                     accountNumberMasked={t.counterparty.accountNumberMasked}
@@ -206,6 +212,7 @@ export function TransactionFeed() {
                     status={t.status}
                     createdAt={t.createdAt}
                     phase={t.id === phaseRowId ? phase : undefined}
+                    onSelect={openDetails}
                   />
                 </li>
               )
@@ -243,6 +250,12 @@ export function TransactionFeed() {
             )}
           </div>
         </AsyncState>
+        <TransactionDetailsDialog
+          id={selectedId}
+          cached={selectedRow}
+          phase={selectedId !== null && selectedId === phaseRowId ? phase : undefined}
+          onClose={closeDetails}
+        />
       </CardContent>
     </Card>
   )

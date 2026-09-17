@@ -32,6 +32,24 @@ async function walk(query: Record<string, string> = {}): Promise<Transaction[]> 
   return all
 }
 
+describe('GET /api/transactions/:id', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'], now: TEST_NOW })
+    seedTestDb()
+  })
+  afterEach(() => vi.useRealTimers())
+
+  it('returns one transaction by id, or 404', async () => {
+    const target = getDb().transactions[123]!
+    const found = await api<Transaction>(`/api/transactions/${target.id}`)
+    expect(found.status).toBe(200)
+    expect(found.body).toEqual(target)
+    const missing = await api<ApiError>('/api/transactions/txn_999999')
+    expect(missing.status).toBe(404)
+    expect(missing.body.error.code).toBe('TRANSACTION_NOT_FOUND')
+  })
+})
+
 describe('GET /api/transactions', () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['Date'], now: TEST_NOW })

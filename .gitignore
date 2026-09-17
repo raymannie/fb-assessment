@@ -29,3 +29,11 @@ npm-debug.log*
 !.vscode/extensions.json
 .idea
 .DS_Store
+.vercel
+
+# Personal working files: not part of the submission
+PROMPTS.md
+BRIEF.md
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat

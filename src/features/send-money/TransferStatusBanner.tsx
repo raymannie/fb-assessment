@@ -3,6 +3,7 @@ import { Loader2Icon, AlertTriangleIcon } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from '@/app/hooks'
 import { Money } from '@/components/Money'
 import { Button } from '@/components/ui/button'
+import { rememberOpener } from '@/lib/returnFocus'
 
 import { openDialog, selectSubmission } from './sendMoneySlice'
 
@@ -30,7 +31,15 @@ export function TransferStatusBanner() {
           <Money kobo={submission.amount} /> to {submission.recipient.accountName}. Don’t send it
           again.
         </p>
-        <Button type="button" size="sm" variant="outline" onClick={() => dispatch(openDialog())}>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            rememberOpener()
+            dispatch(openDialog())
+          }}
+        >
           View
         </Button>
       </div>

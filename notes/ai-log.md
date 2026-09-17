@@ -109,3 +109,13 @@ Notable pushback from the model, which I accepted:
   One unreproduced failure (3 "serious" nodes at light/360 on the first run; 0 in ~10 reruns) —
   the scan now prints rule id + target so a recurrence is self-explanatory.
 - Storybook cut on purpose (Phase 0 plan): large install, no assessment weight vs. the above.
+
+## Transaction details (post-Phase 8 addition)
+
+- Row → detail sheet; the open id lives in `?txn=` (deep-linkable; back closes). New
+  `GET /api/transactions/:id` backs deep links to unloaded pages; optimistic rows come from cache.
+- Radix's _modal_ Dialog focuses its `DialogTrigger` on close and otherwise drops focus on <body>.
+  Our dialogs open from state with no trigger, so focus was being lost on close — for Send Money too,
+  unnoticed until the details test asserted focus return. `lib/returnFocus.ts` captures the opener.
+- `gotoApp` waited on `getByRole('banner')`; a deep link opens a modal immediately, which makes the
+  header aria-hidden and the fixture hang. Waits on the element now.
