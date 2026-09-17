@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en-NG">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>NovaBiz Merchant Dashboard</title>
+    <script>
+      // Apply the persisted theme before first paint to avoid a light/dark flash.
+      // The only value ever stored in localStorage is this theme preference.
+      ;(function () {
+        try {
+          var stored = localStorage.getItem('novabiz.theme')
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+          var dark = stored === 'dark' || (stored !== 'light' && prefersDark)
+          if (dark) document.documentElement.classList.add('dark')
+        } catch (e) {
+          /* storage unavailable: fall through to light */
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
